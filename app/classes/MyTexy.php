@@ -203,7 +203,7 @@ class MyTexy extends \Texy
 		if ($image->width) $template->width = $image->width;
 		if ($image->height) $template->height = $image->height;
 
-		return $this->protect((string) $template, Texy::CONTENT_BLOCK);
+		return $this->protect((string) $template, MyTexy::CONTENT_BLOCK);
 	}
 
 }

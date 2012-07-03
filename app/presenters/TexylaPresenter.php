@@ -36,7 +36,7 @@ class TexylaPresenter extends BasePresenter
 	public function startup()
 	{
 		parent::startup();
-		$this->texy = $this->context->texy;
+		$this->texy = $this->context->Texy;
 		$this->baseFolderPath = $this->texy->imageModule->fileRoot;
 		$this->baseFolderUri = $this->texy->imageModule->root;
 		$this->tempDir = $this->baseFolderPath . '/../webtemp';
