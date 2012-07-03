@@ -29,6 +29,9 @@ common:
 	services:
 		authenticator: Authenticator
 
+		Texy:
+			class: TexylaExample\MyTexy(@httpRequest)
+
 
 	factories:
 
