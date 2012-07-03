@@ -38,7 +38,7 @@ class HomepagePresenter extends BasePresenter
 		$values = $form->getValues();
 
 		// Get TEXY service to apply it at raw data
-		$texy = $this->context->Texy;
+		$texy = $this->context->texy;
 
 		// Process data through TEXY
 		$html = $texy->process($values->text);

@@ -1,7 +1,9 @@
 <?php
 
-use Nette\Utils\Strings, Nette\Image;
-use Nette\Application\Responses\TextResponse, Nette\Application\Responses\JsonResponse;
+use Nette\Utils\Strings,
+	Nette\Image;
+use Nette\Application\Responses\TextResponse,
+	Nette\Application\Responses\JsonResponse;
 
 /**
  * Texyla presenter
@@ -11,6 +13,7 @@ use Nette\Application\Responses\TextResponse, Nette\Application\Responses\JsonRe
  */
 class TexylaPresenter extends BasePresenter
 {
+
 	/** @var string */
 	private $baseFolderPath;
 
@@ -23,6 +26,9 @@ class TexylaPresenter extends BasePresenter
 	/** @var string */
 	private $tempUri;
 
+	/** @var \TexylaExample\MyTexy */
+	private $texy;
+
 
 	/**
 	 * Startup
@@ -30,30 +36,24 @@ class TexylaPresenter extends BasePresenter
 	public function startup()
 	{
 		parent::startup();
-		$texy = $this->getService('Texy');
-		$this->baseFolderPath = $texy->imageModule->fileRoot;
-		$this->baseFolderUri = $texy->imageModule->root;
+		$this->texy = $this->context->texy;
+		$this->baseFolderPath = $this->texy->imageModule->fileRoot;
+		$this->baseFolderUri = $this->texy->imageModule->root;
 		$this->tempDir = $this->baseFolderPath . '/../webtemp';
 		$this->tempUri = $this->template->basePath . '/webtemp';
 	}
-
-
 
 	/**
 	 * Texyla preview
 	 */
 	public function actionPreview()
 	{
-		$texy = $this->getService('Texy');
 		$httpRequest = $this->context->httpRequest;
-		$html = $texy->process($httpRequest->getPost("texy"));
+		$html = $this->texy->process($httpRequest->getPost("texy"));
 		$this->sendResponse(new TextResponse($html));
 	}
 
-
 	// files plugin
-
-
 
 	/**
 	 * Send error message
@@ -62,11 +62,9 @@ class TexylaPresenter extends BasePresenter
 	private function sendError($msg)
 	{
 		$this->sendResponse(new JsonResponse(array(
-			"error" => $msg,
-		), "text/plain"));
+				"error" => $msg,
+				), "text/plain"));
 	}
-
-
 
 	/**
 	 * Get and check path to folder
@@ -83,8 +81,6 @@ class TexylaPresenter extends BasePresenter
 		return $folderPath;
 	}
 
-
-
 	/**
 	 * File name with cached preview image in file browser
 	 * @param string $path
@@ -95,8 +91,6 @@ class TexylaPresenter extends BasePresenter
 		$path = realpath($path);
 		return "texylapreview-" . md5($path . "|" . filemtime($path)) . ".jpg";
 	}
-
-
 
 	/**
 	 * File browser - list files
@@ -111,7 +105,8 @@ class TexylaPresenter extends BasePresenter
 
 		try {
 			$folderPath = $this->getFolderPath($folder);
-		} catch (InvalidArgumentException $e) {
+		}
+		catch (InvalidArgumentException $e) {
 			$this->sendError("Folder does not exist or is not writeable.");
 		}
 
@@ -176,11 +171,9 @@ class TexylaPresenter extends BasePresenter
 
 		// send response
 		$this->sendResponse(new JsonResponse(array(
-			"list" => array_merge($folders, $files),
-		)));
+				"list" => array_merge($folders, $files),
+			)));
 	}
-
-
 
 	/**
 	 * Genarate and show preview of the image in file browser
@@ -194,13 +187,13 @@ class TexylaPresenter extends BasePresenter
 			$image->save($this->tempDir . "/" . $this->thumbnailFileName($path));
 			@chmod($path, 0666);
 			$image->send();
-		} catch (Exception $e) {
+		}
+		catch (Exception $e) {
 			Image::fromString(Image::EMPTY_GIF)->send(Image::GIF);
 		}
 
 		$this->terminate();
 	}
-
 
 	/**
 	 * File upload
@@ -208,18 +201,18 @@ class TexylaPresenter extends BasePresenter
 	public function actionUpload()
 	{
 		$httpRequest = $this->context->httpRequest;
-		
+
 		// check user rights
 //		if (!Environment::getUser()->isAllowed("files", "upload")) {
 //			$this->sendError("Access denied.");
 //		}
-
 		// path
 		$folder = $httpRequest->getPost("folder");
 
 		try {
 			$folderPath = $this->getFolderPath($folder);
-		} catch (InvalidArgumentException $e) {
+		}
+		catch (InvalidArgumentException $e) {
 			$this->sendError("Folder does not exist or is not writeable.");
 		}
 
@@ -252,8 +245,6 @@ class TexylaPresenter extends BasePresenter
 		}
 	}
 
-
-
 	/**
 	 * Make directory
 	 * @param string folder
@@ -266,14 +257,12 @@ class TexylaPresenter extends BasePresenter
 
 		if (mkdir($path)) {
 			$this->sendResponse(new JsonResponse(array(
-				"name" => $name,
-			)));
+					"name" => $name,
+				)));
 		} else {
 			$this->sendError("Unable to create directory $path");
 		}
 	}
-
-
 
 	/**
 	 * Delete file or directory
@@ -291,8 +280,8 @@ class TexylaPresenter extends BasePresenter
 		if (is_dir($path)) {
 			if (rmdir($path)) {
 				$this->sendResponse(new JsonResponse(array(
-					"deleted" => true,
-				)));
+						"deleted" => true,
+					)));
 			} else {
 				$this->sendError("Unable to delete directory.");
 			}
@@ -301,15 +290,13 @@ class TexylaPresenter extends BasePresenter
 		if (is_file($path)) {
 			if (unlink($path)) {
 				$this->sendResponse(new JsonResponse(array(
-					"deleted" => true,
-				)));
+						"deleted" => true,
+					)));
 			} else {
 				$this->sendError("Unable to delete file.");
 			}
 		}
 	}
-
-
 
 	/**
 	 * Rename file or directory
@@ -328,8 +315,8 @@ class TexylaPresenter extends BasePresenter
 
 		if (rename($oldpath, $newpath)) {
 			$this->sendResponse(new JsonResponse(array(
-				"deleted" => true,
-			)));
+					"deleted" => true,
+				)));
 		} else {
 			$this->sendError("Unable to rename file.");
 		}
