@@ -21,8 +21,10 @@ class HomepagePresenter extends BasePresenter
 	{
 		$form = new Form;
 
-		$form->addTextarea("text", NULL, 80, 20)
-			->getControlPrototype()->class("texyla");
+		$form->addTextarea("text", NULL)
+             ->setAttribute('cols', 80)
+             ->setAttribute('rows', 20)
+			 ->getControlPrototype()->class("texyla");
 
 		$form->addSubmit("s", "Submit");
 		$form->onSuccess[] = callback($this, 'exampleFormSubmitted');
